@@ -13,32 +13,72 @@ class Home extends Component {
     
         const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         this.state = {
-          dataSource: ds.cloneWithRows(['row 1', 'row 2']),
+          dataSource: ds.cloneWithRows(['row 1', 'row 2', 'row 3']),
         };
     }
 
     render() {
-        let screenWidth = Dimensions.get('window').width;
-        console.log(screenWidth);
-        let headerImageRatio = 4/3;
-        const Header = (props) => (
-            <Image
-                width={480}
-                height={360}
-                source={{uri:'http://f.imgs.vietnamnet.vn/2017/10/21/21/20171021210959-bao-tang-ha-noi.jpg'}}
-            >
-
-            </Image>
-        );
-        
         return (
             <ListView
                 style={styles.container}
                 dataSource={this.state.dataSource}
                 renderRow={(data) => <View><Text>{data}</Text></View>}
-                renderHeader={() => <Header />}
+                renderHeader={this.renderHeader}
             />
         );
+    };
+
+    renderHeader() {
+
+        let screenWidth = Dimensions.get('window').width;
+        let headerImageRatio = 3/2;
+        let headerImageHeight = screenWidth/headerImageRatio;
+
+        return (
+            <View style={styles.container}>
+                <Image
+                    style={{
+                        backgroundColor:'transparent',
+                        height: screenWidth/headerImageRatio,
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                    }}
+                    source={{uri:'http://vanhien.vn/uploads/news/2014/11/khue-van-cac.jpg'}}
+                >
+                </Image>
+                <View style={{
+                    marginTop:headerImageHeight - 120,
+                    backgroundColor: 'transparent',
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <View style={{
+                                    height:80,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                    position: 'absolute',
+                                    top: 10,
+                                    left: 0,
+                                    right: 0
+                                }}>
+                    </View>
+                    <Text style={styles.avatarName}>boy</Text>
+                    <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/1/17/Batman-BenAffleck.jpg'}} style={styles.avatar} />
+                    <Image source={{ uri: 'https://images.moviepilot.com/image/upload/c_fill,h_340,q_auto:good,w_460/b4yxwv7bffhfpc86clig.jpg'}} style={styles.avatar} />
+                    <Text style={styles.avatarName}>girl</Text>
+                </View>
+                <View style={{
+                                marginTop:50,
+                                height:80,
+                                backgroundColor: 'white',
+                            }}>
+
+                </View>
+            </View>
+        )
     }
 }
 
@@ -47,12 +87,15 @@ export default Home;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
-        padding: 12,
+        backgroundColor: 'rgb(205,205,205)',
     },
-    header: {
-        flex: 1,
-        backgroundColor:'transparent'
+    avatar: {
+        height: 100,
+        width: 100,
+        borderRadius: 50,
+    },
+    avatarName: {
+        padding: 20,
     },
     red: {
         color: 'red'
