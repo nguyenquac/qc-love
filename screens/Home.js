@@ -49,6 +49,21 @@ class Home extends Component {
         let anniversaryDatePanelMarginTop = headerImageHeight*0.15;
         let anniversaryDatePanelHeight = avatarNamePanelHeight;
 
+        let anniversaryDateRoundBackgroundSize = anniversaryDatePanelHeight*0.95;
+
+        let calendarHeight = (anniversaryDateRoundBackgroundSize/2) * Math.cos(Math.PI/4.8) * 2;
+        let calendarWidth = (anniversaryDateRoundBackgroundSize/2) * Math.sin(Math.PI/4.8) * 2;
+
+        let anniMonth = 2;
+        let anniDay = 17;
+        let daysTogether = 365;
+
+        let avatarNameFontSize = 20;
+        let anniMonthFontSize = 14;
+        let anniDayFontSize = 24;
+        let anniCountFontSize = 42;
+        let anniDaysTogetherLabelFontSize = 26;
+
         const avatarStyles = StyleSheet.create({
             avatar: {
                 height: avatarDiameter,
@@ -72,7 +87,7 @@ class Home extends Component {
                 marginLeft: 10,
             },
             avatarName: {
-                fontSize: 20,
+                fontSize: avatarNameFontSize,
                 color: "#474747",
                 fontWeight: 'bold'
             },
@@ -134,16 +149,70 @@ class Home extends Component {
                                 justifyContent: 'center'
                             }}>
                     <View style={{
-                        width: anniversaryDatePanelHeight*0.95,
-                        height: anniversaryDatePanelHeight*0.95,
-                        borderRadius: (anniversaryDatePanelHeight*0.95)/2,
+                        width: anniversaryDateRoundBackgroundSize,
+                        height: anniversaryDateRoundBackgroundSize,
+                        borderRadius: anniversaryDateRoundBackgroundSize/2,
                         backgroundColor: '#a3ffd4',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                        
+                        <View style={{
+                            backgroundColor: '#ff325b',
+                            width: calendarWidth,
+                            height: calendarHeight * 0.25,
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <Text style={{
+                                fontSize: anniMonthFontSize,
+                                color: 'white'
+                            }}>
+                            Th {anniMonth}
+                            </Text>
+                        </View>
+                        <View style={{
+                            backgroundColor: 'white',
+                            width: calendarWidth,
+                            height: calendarHeight * 0.75,
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <Text style={{
+                                fontSize: anniDayFontSize,
+                                color: '#1e1e1e',
+                                fontWeight: 'bold'
+                            }}>
+                            {anniDay}
+                            </Text>
+                        </View>
                     </View>
+
+                    <View style={{
+                        width: anniversaryDateRoundBackgroundSize*2.2,
+                        height: anniversaryDatePanelHeight,
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                       <Text style={{
+                                fontSize: anniCountFontSize,
+                                lineHeight: anniCountFontSize * 0.92,
+                                color: '#1e1e1e',
+                                fontWeight: 'bold',
+                            }}>
+                            {daysTogether}
+                        </Text>
+                        <Text style={{
+                                fontSize: anniDaysTogetherLabelFontSize,
+                                color: '#1e1e1e',
+                            }}>
+                            ngày bên nhau
+                        </Text> 
+                    </View>
+
                 </View>
             </View>
         )
