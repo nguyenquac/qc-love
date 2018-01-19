@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ListView, Dimensions, Image } from 'react-native';
 import { Button} from 'react-native-elements';
-
+import AppText from '../helpers/TextHelper'
 import AppTextStyle from '../styles/AppTextStyle'
 
 class Home extends Component {
@@ -54,15 +54,39 @@ class Home extends Component {
         let calendarHeight = (anniversaryDateRoundBackgroundSize/2) * Math.cos(Math.PI/4.8) * 2;
         let calendarWidth = (anniversaryDateRoundBackgroundSize/2) * Math.sin(Math.PI/4.8) * 2;
 
-        let anniMonth = 2;
+        let tillAnniversaryPanelMarginTop = headerImageHeight*0.05;
+        let tillAnniversaryPanelHeight = anniversaryDatePanelHeight*0.4;
+
+        let anniMonth = 1; // start from 0 -> feb = 1
         let anniDay = 17;
-        let daysTogether = 365;
+        let anniYear = 2017;
+
+        let anniDate = new Date(anniYear,anniMonth,anniDay);
+        let todayDate = new Date();
+        //Get 1 day in milliseconds
+        let one_day=1000*60*60*24;
+        // Convert both dates to milliseconds
+        let date1_ms = anniDate.getTime();
+        let date2_ms = todayDate.getTime();
+        // Calculate the difference in milliseconds
+        var difference_ms = date2_ms - date1_ms;
+        // Convert back to days and return
+        let daysTogether = Math.floor(difference_ms/one_day);
+
+        let nextAnniDateYear = ((todayDate.getMonth() < anniMonth) || (todayDate.getMonth() == anniMonth && todayDate.getDate() <= anniDay)) ? todayDate.getFullYear() : todayDate.getFullYear() + 1;
+        let nextAnniDate = new Date(nextAnniDateYear, anniMonth, anniDay);
+        let date3_ms = todayDate.getTime();
+        let date4_ms = nextAnniDate.getTime();
+        difference_ms = date4_ms - date3_ms;
+        let tillAnniDay = Math.ceil(difference_ms/one_day);
 
         let avatarNameFontSize = 20;
         let anniMonthFontSize = 14;
         let anniDayFontSize = 24;
         let anniCountFontSize = 42;
         let anniDaysTogetherLabelFontSize = 26;
+        let tillAnniDayFontSize = 28;
+        let tillAnniDayLabelFontSize = 20;
 
         const avatarStyles = StyleSheet.create({
             avatar: {
@@ -124,10 +148,10 @@ class Home extends Component {
                                     right: 0
                                 }}>
                     </View>
-                    <View style={avatarStyles.avatarNameContainerLeft}><Text style={AppTextStyle.appText}><Text style={avatarStyles.avatarName}>{leftName}</Text></Text></View>
+                    <View style={avatarStyles.avatarNameContainerLeft}><AppText style={avatarStyles.avatarName}>{leftName}</AppText></View>
                     <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/1/17/Batman-BenAffleck.jpg'}} style={avatarStyles.avatar} />
                     <Image source={{ uri: 'https://images.moviepilot.com/image/upload/c_fill,h_340,q_auto:good,w_460/b4yxwv7bffhfpc86clig.jpg'}} style={avatarStyles.avatar} />
-                    <View style={avatarStyles.avatarNameContainerRight}><Text style={AppTextStyle.appText}><Text style={avatarStyles.avatarName}>{rightName}</Text></Text></View>
+                    <View style={avatarStyles.avatarNameContainerRight}><AppText style={avatarStyles.avatarName}>{rightName}</AppText></View>
                     <Image source={require('../assets/heart-stroke.png')}
                         style={{
                             position: 'absolute',
@@ -165,12 +189,12 @@ class Home extends Component {
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}>
-                            <Text style={{
+                            <AppText style={{
                                 fontSize: anniMonthFontSize,
                                 color: 'white'
                             }}>
                             Th {anniMonth}
-                            </Text>
+                            </AppText>
                         </View>
                         <View style={{
                             backgroundColor: 'white',
@@ -180,13 +204,12 @@ class Home extends Component {
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}>
-                            <Text style={{
+                            <AppText style={{
                                 fontSize: anniDayFontSize,
-                                color: '#1e1e1e',
                                 fontWeight: 'bold'
                             }}>
                             {anniDay}
-                            </Text>
+                            </AppText>
                         </View>
                     </View>
 
@@ -197,23 +220,44 @@ class Home extends Component {
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                       <Text style={{
+                       <AppText style={{
                                 fontSize: anniCountFontSize,
                                 lineHeight: anniCountFontSize * 0.92,
-                                color: '#1e1e1e',
                                 fontWeight: 'bold',
                             }}>
                             {daysTogether}
-                        </Text>
-                        <Text style={{
+                        </AppText>
+                        <AppText style={{
                                 fontSize: anniDaysTogetherLabelFontSize,
-                                color: '#1e1e1e',
                             }}>
                             ngày bên nhau
-                        </Text> 
+                        </AppText> 
                     </View>
 
                 </View>
+
+                <View style={{
+                                marginTop:tillAnniversaryPanelMarginTop,
+                                height:tillAnniversaryPanelHeight,
+                                backgroundColor: 'white',
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                    <AppText style={{
+                            fontSize: tillAnniDayFontSize,
+                            fontWeight: 'bold',
+                        }}>
+                        {tillAnniDay}
+                    </AppText>
+                    <AppText style={{
+                            fontSize: tillAnniDayLabelFontSize,
+                        }}>
+                        {'  ngày đến lễ kỉ niệm'}
+                    </AppText> 
+                </View>
+
             </View>
         )
     }
