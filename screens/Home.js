@@ -80,13 +80,13 @@ class Home extends Component {
         difference_ms = date4_ms - date3_ms;
         let tillAnniDay = Math.ceil(difference_ms/one_day);
 
-        let avatarNameFontSize = 20;
-        let anniMonthFontSize = 14;
-        let anniDayFontSize = 24;
-        let anniCountFontSize = 42;
-        let anniDaysTogetherLabelFontSize = 26;
-        let tillAnniDayFontSize = 28;
-        let tillAnniDayLabelFontSize = 20;
+        let avatarNameFontSize = 30;
+        let anniMonthFontSize = 22;
+        let anniDayFontSize = 36;
+        let anniCountFontSize = 64;
+        let anniDaysTogetherLabelFontSize = 35;
+        let tillAnniDayFontSize = 42;
+        let tillAnniDayLabelFontSize = 30;
 
         const avatarStyles = StyleSheet.create({
             avatar: {
@@ -113,7 +113,6 @@ class Home extends Component {
             avatarName: {
                 fontSize: avatarNameFontSize,
                 color: "#474747",
-                fontWeight: 'bold'
             },
         });
 
@@ -167,7 +166,6 @@ class Home extends Component {
                                 marginTop:anniversaryDatePanelMarginTop,
                                 height:anniversaryDatePanelHeight,
                                 backgroundColor: 'white',
-                                flex: 1,
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 justifyContent: 'center'
@@ -193,7 +191,7 @@ class Home extends Component {
                                 fontSize: anniMonthFontSize,
                                 color: 'white'
                             }}>
-                            Th {anniMonth}
+                            Th {anniMonth+1}
                             </AppText>
                         </View>
                         <View style={{
@@ -206,7 +204,6 @@ class Home extends Component {
                         }}>
                             <AppText style={{
                                 fontSize: anniDayFontSize,
-                                fontWeight: 'bold'
                             }}>
                             {anniDay}
                             </AppText>
@@ -216,22 +213,37 @@ class Home extends Component {
                     <View style={{
                         width: anniversaryDateRoundBackgroundSize*2.2,
                         height: anniversaryDatePanelHeight,
+
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                       <AppText style={{
+                        <View style={{
+                            height: 300,
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end',
+                        }}>
+                            <AppText style={{
                                 fontSize: anniCountFontSize,
-                                lineHeight: anniCountFontSize * 0.92,
-                                fontWeight: 'bold',
+                                lineHeight: anniCountFontSize
                             }}>
-                            {daysTogether}
-                        </AppText>
-                        <AppText style={{
-                                fontSize: anniDaysTogetherLabelFontSize,
-                            }}>
-                            ngày bên nhau
-                        </AppText> 
+                            {   daysTogether}
+                            </AppText>
+                        </View>
+                        <View style={{
+                            height: 300,
+                            flexDirection: 'column',
+                            justifyContent: 'flex-start',
+                        }}>
+                            <AppText style={{
+                                    fontSize: anniDaysTogetherLabelFontSize,
+                                    marginTop: -anniDaysTogetherLabelFontSize/4
+
+                                }}>
+                                ngày bên nhau
+                            </AppText> 
+                        </View>
+
                     </View>
 
                 </View>
@@ -247,7 +259,6 @@ class Home extends Component {
                             }}>
                     <AppText style={{
                             fontSize: tillAnniDayFontSize,
-                            fontWeight: 'bold',
                         }}>
                         {tillAnniDay}
                     </AppText>
