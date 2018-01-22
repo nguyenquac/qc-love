@@ -1,8 +1,32 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ListView, Dimensions, Image } from 'react-native';
+import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList } from 'react-native';
 import { Button} from 'react-native-elements';
 import AppText from '../helpers/TextHelper'
 import AppTextStyle from '../styles/AppTextStyle'
+import AvView from '../AvView'
+
+const data = [{
+    id: 1,
+    date_created: '22/01/2017',
+    type: 'image',
+    media_path: 'https://github.com/saitoxu/InstaClone/raw/master/contents/images/landscape.jpg',
+    caption: "test caption"
+  },
+  {
+    id: 2,
+    date_created: '21/01/2017',
+    type: 'image',
+    media_path: 'https://github.com/saitoxu/InstaClone/raw/master/contents/images/snow.jpg',
+    caption: "test caption 2"
+  },
+  {
+    id: 3,
+    date_created: '20/01/2017',
+    type: 'image',
+    media_path: 'https://github.com/saitoxu/InstaClone/raw/master/contents/images/town.jpg',
+    caption: "test caption 3"
+  },
+]
 
 class Home extends Component {
 
@@ -21,11 +45,15 @@ class Home extends Component {
 
     render() {
         return (
-            <ListView
+            <FlatList
                 style={styles.container}
-                dataSource={this.state.dataSource}
-                renderRow={(data) => <View><Text>{data}</Text></View>}
-                renderHeader={this.renderHeader}
+                data={data}
+                ListHeaderComponent={this.renderHeader}
+                renderItem={({ item }) => (
+                    <View>
+                        <AvView type={item.type} source={item.media_path} />
+                    </View>
+                )}
             />
         );
     };
@@ -55,7 +83,7 @@ class Home extends Component {
         let calendarWidth = (anniversaryDateRoundBackgroundSize/2) * Math.sin(Math.PI/4.8) * 2;
 
         let tillAnniversaryPanelMarginTop = headerImageHeight*0.05;
-        let tillAnniversaryPanelHeight = anniversaryDatePanelHeight*0.4;
+        let tillAnniversaryPanelHeight = anniversaryDatePanelHeight*0.5;
 
         let anniMonth = 1; // start from 0 -> feb = 1
         let anniDay = 17;
