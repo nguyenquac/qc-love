@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList } from 'react-native';
-import { Button} from 'react-native-elements';
+import { ImagePicker } from 'expo';
+import { Button, Icon } from 'react-native-elements';
 import AppText from '../helpers/TextHelper'
 import AppTextStyle from '../styles/AppTextStyle'
 import AvView from '../AvView'
@@ -28,11 +29,11 @@ const data = [{
   },
 ]
 
+var globalThis;
+
 class Home extends Component {
 
-    handleSettingsPress = () => {
-        this.props.navigation.navigate('Scr1');
-    };
+    static HEADER_IMAGE_RATIO = 3/2;
 
     constructor(props) {
         super(props);
@@ -43,15 +44,79 @@ class Home extends Component {
         };
     }
 
+    componentWillMount() {
+        globalThis = this;
+    }
+
+    static navigationOptions = ({ navigation }) => ({
+        headerRight: <Icon large color='white' name='add' onPress={() => globalThis.onAddImageFromLibraryPress()}></Icon>,
+        headerLeft: <Icon large color='white' name='toc'></Icon>,
+    });
+
+    onAddImageFromLibraryPress = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true});
+        
+    
+        if (!result.cancelled) {
+            this.props.navigation.navigate('AddImage', { imageUri: result.uri });
+        }
+      };
+
     render() {
+
+        let screenWidth = Dimensions.get('window').width;
+        let headerImageHeight = screenWidth/Home.HEADER_IMAGE_RATIO;
+        let datePanelHeight = headerImageHeight * 0.15;
+        let rowPaddingBottom = headerImageHeight * 0.05;
+        
+        let dateFontSize = 25;
+        let captionFontSize = 20;
+
         return (
             <FlatList
                 style={styles.container}
                 data={data}
+                keyExtractor={(item, index) => index}
                 ListHeaderComponent={this.renderHeader}
                 renderItem={({ item }) => (
-                    <View>
+                    <View style={{
+                        paddingBottom: rowPaddingBottom
+                    }}>
+                        <View style={{ 
+                            height: datePanelHeight,
+                            backgroundColor: 'white',
+                            flexDirection: 'column',
+                            justifyContent: 'center'            
+                        }}>
+                            <AppText style={{
+                                textAlign: 'center',
+                                fontSize: dateFontSize
+                            }}>
+                                {item.date_created}
+                            </AppText>
+                            <Icon large color='black' name='md-more' type='ionicon'
+                            containerStyle={{
+                                position: 'absolute',
+                                width: datePanelHeight*0.5,
+                                height: datePanelHeight*0.5,
+                                top: datePanelHeight*0.25,
+                                right: datePanelHeight*0.25
+                            }}></Icon>
+                        </View>
                         <AvView type={item.type} source={item.media_path} />
+                        <View style={{
+                            backgroundColor: 'white',
+                            minHeight: datePanelHeight,
+                            flexDirection: 'column',
+                            justifyContent: 'center'    
+                        }}>
+                            <AppText style={{
+                                textAlign: 'center',
+                                fontSize: captionFontSize
+                            }}>
+                                {item.caption}
+                            </AppText>
+                        </View>
                     </View>
                 )}
             />
@@ -61,8 +126,7 @@ class Home extends Component {
     renderHeader() {
 
         let screenWidth = Dimensions.get('window').width;
-        let headerImageRatio = 3/2;
-        let headerImageHeight = screenWidth/headerImageRatio;
+        let headerImageHeight = screenWidth/Home.HEADER_IMAGE_RATIO;
         let avatarNamePanelHeight = headerImageHeight * 0.3;
         let avatarDiameter = avatarNamePanelHeight * 1.2;
         let avatarNamePanelMarginTop = (avatarDiameter - avatarNamePanelHeight)/2;
@@ -149,7 +213,7 @@ class Home extends Component {
                 <Image
                     style={{
                         backgroundColor:'transparent',
-                        height: screenWidth/headerImageRatio,
+                        height: headerImageHeight,
                         position: 'absolute',
                         top: 0,
                         left: 0,
@@ -296,6 +360,11 @@ class Home extends Component {
                         {'  ngày đến lễ kỉ niệm'}
                     </AppText> 
                 </View>
+
+                <View style={{
+                    height:tillAnniversaryPanelMarginTop,
+                    backgroundColor:'transparent'
+                }}></View>
 
             </View>
         )

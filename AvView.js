@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Image, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
-import Video from 'react-native-video'
+//import Video from 'react-native-video'
 import { Ionicons } from '@expo/vector-icons'
 
 const { width } = Dimensions.get('window');
@@ -25,7 +25,7 @@ export default class AvView extends Component {
     super(props);
     this.onLoad = this.onLoad.bind(this);
     this.onProgress = this.onProgress.bind(this);
-    this.onBuffer = this.onBuffer.bind(this);
+    //this.onBuffer = this.onBuffer.bind(this);
   }
 
   componentWillMount() {

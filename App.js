@@ -5,6 +5,7 @@ import { Font } from 'expo';
 
 import Home from './screens/Home';
 import Scr1 from './screens/Scr1';
+import AddImage from './screens/AddImage';
 
 import BoyThemeStyle from './styles/ThemeBoyStyle'
 const themeStyle = BoyThemeStyle;
@@ -29,24 +30,37 @@ export default class App extends React.Component {
     {
       return null;
     }
+
+    let headerTitleFontSize = 40;
+
     const HomeStack = StackNavigator({
       Home: {
         screen: Home,
         navigationOptions: {
-          title: 'Home',
+          title: 'QCLove',
         },
       },
-      Scr1: {
-        screen: Scr1,
+      AddImage: {
+        screen: AddImage,
         navigationOptions: ({ navigation }) => ({
-          title: 'Screen 1',
+          title: 'Image',
+
         }),
       },
     },
     {
         navigationOptions: {
           headerStyle: themeStyle.header,
-          headerTitleStyle: themeStyle.headerTitleStyle 
+          headerTitleStyle: {
+            color: 'white',
+            fontFamily: 'haptic',
+            fontSize: headerTitleFontSize, 
+            fontWeight: "200",
+            alignSelf: 'center',
+          },
+          headerBackTitle: null,
+          headerTintColor: 'white',
+          
         }
     });
 
