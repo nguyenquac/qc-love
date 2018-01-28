@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, TextInput} from 'react-native';
 import { Button, Icon, Avatar } from 'react-native-elements';
+import DatePicker from 'react-native-datepicker';
+import Moment, { now } from 'moment';
 
 export default class AddImage extends Component {
     
@@ -11,10 +13,14 @@ export default class AddImage extends Component {
 
     constructor(props) {
         super(props);
+
+        // get default date
+        var nowDt = Moment();
+
         this.state = {
             caption: '',
             imageUri: this.props.navigation.state.params.imageUri,
-            date: '24/01/2018'
+            date: Moment(nowDt).format('DD/MM/YYYY')
         };
     }
     
@@ -68,19 +74,23 @@ export default class AddImage extends Component {
                         textAlignVertical: 'center',
                     }}>Ngày</Text>
 
-                    <Text style={{
-                        flex: 1,
-                        fontSize: dateFontSize,
-                        textAlign: 'right',
-                        textAlignVertical: 'center',
-                        padding: 10,
-                    }}>{this.state.date}</Text>
-
-                    <Avatar 
-                        width={dateRowHeight*0.7} 
-                        height={dateRowHeight*0.7} 
-                        source={require('../assets/icon_calendar.png')}
-                        overlayContainerStyle={{backgroundColor: 'transparent'}}
+                    <DatePicker
+                        style={{width: 200}}
+                        date={this.state.date}
+                        mode="date"
+                        placeholder="placeholder"
+                        format="DD/MM/YYYY"
+                        minDate="01/01/2017"
+                        maxDate="01/01/2050"
+                        confirmBtnText="Confirm"
+                        cancelBtnText="Cancel"
+                        iconSource={require('../assets/icon_calendar.png')}
+                        customStyles={{
+                            dateText: {
+                                fontSize: dateFontSize
+                            }
+                        }}
+                        onDateChange={(date) => {this.setState({date: date});}}
                     />
                 </View>
                 <View style={{
