@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList } from 'react-native';
+import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator } from 'react-native';
 import { ImagePicker } from 'expo';
 import { Button, Icon } from 'react-native-elements';
 import AppText from '../helpers/TextHelper'
 import AppTextStyle from '../styles/AppTextStyle'
 import AvView from '../AvView'
+import Moment, { now } from 'moment';
 
 const data = [{
     id: 1,
@@ -34,13 +35,17 @@ var globalThis;
 class Home extends Component {
 
     static HEADER_IMAGE_RATIO = 3/2;
+    static PAGE_SIZE = 20;
 
     constructor(props) {
         super(props);
-    
-        const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
         this.state = {
-          dataSource: ds.cloneWithRows(['row 1', 'row 2', 'row 3']),
+            data: [],
+            loading: false,
+            page: 0,
+            refreshing: false,
+            needLoadMore: true,
         };
     }
 
@@ -55,14 +60,55 @@ class Home extends Component {
 
     onAddImageFromLibraryPress = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true});
-        
     
         if (!result.cancelled) {
-            this.props.navigation.navigate('AddImage', { imageUri: result.uri });
+            this.props.navigation.navigate('AddImage', { imageUri: result.uri, imageWidth: result.width, imageHeight: result.height, homeScreen: this});
         }
-      };
+    };
 
-    render() {
+    reload = () => {
+        console.log("\nRELOADING\n");
+    }
+
+    fetchPostsRequest = () => {
+        console.log("\nFetch posts");
+        const { page } = this.state;
+        var pageSize = Home.PAGE_SIZE;
+        const url = `${global.serverUrl}/api.php/post?order=date_created,desc&page=${page},${pageSize}`;
+        console.log(url);
+        this.setState({ loading: true });
+        fetch(url)
+        .then(res => res.json())
+        .then(res => {
+            console.log(res.post.records);
+            this.setState({
+                data: page === 1 ? res.post.records : [...this.state.data, ...res.post.records],
+                loading: false,
+                refreshing: false,
+                needLoadMore: res.post.records.length < Home.PAGE_SIZE ? false : true,
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            this.setState({ loading: false, page: this.state.page - 1 });
+        });
+    }
+
+    handleLoadMore() {
+        if (this.state.needLoadMore) {
+            console.log('\nLoad more');
+            this.setState(
+                {
+                    page: this.state.page + 1
+                },
+                () => {
+                    this.fetchPostsRequest();
+                }
+            );
+        }
+    }
+
+    _renderPostItem(item){
 
         let screenWidth = Dimensions.get('window').width;
         let headerImageHeight = screenWidth/Home.HEADER_IMAGE_RATIO;
@@ -72,53 +118,65 @@ class Home extends Component {
         let dateFontSize = 25;
         let captionFontSize = 20;
 
+        var date = Moment(item[1]);
+        var dateStr = Moment(date).format("DD/MM/YYYY");
+        var postSrc = `${global.serverUrl}${item[6]}`;
+
+        var type = item[4] == 1 ? "image" : "video";
+
+        return (
+            <View style={{
+                paddingBottom: rowPaddingBottom
+            }}>
+                <View style={{ 
+                    height: datePanelHeight,
+                    backgroundColor: 'white',
+                    flexDirection: 'column',
+                    justifyContent: 'center'            
+                }}>
+                    <AppText style={{
+                        textAlign: 'center',
+                        fontSize: dateFontSize
+                    }}>
+                        {dateStr}
+                    </AppText>
+                    <Icon large color='black' name='md-more' type='ionicon'
+                    containerStyle={{
+                        position: 'absolute',
+                        width: datePanelHeight*0.5,
+                        height: datePanelHeight*0.5,
+                        top: datePanelHeight*0.25,
+                        right: datePanelHeight*0.25
+                    }}></Icon>
+                </View>
+                <AvView type={type} source={postSrc} />
+                <View style={{
+                    backgroundColor: 'white',
+                    minHeight: datePanelHeight,
+                    flexDirection: 'column',
+                    justifyContent: 'center'    
+                }}>
+                    <AppText style={{
+                        textAlign: 'center',
+                        fontSize: captionFontSize
+                    }}>
+                        {item[5]}
+                    </AppText>
+                </View>
+            </View>
+        );
+    }
+
+    render() {
         return (
             <FlatList
                 style={styles.container}
-                data={data}
+                data={this.state.data}
                 keyExtractor={(item, index) => index}
                 ListHeaderComponent={this.renderHeader}
-                renderItem={({ item }) => (
-                    <View style={{
-                        paddingBottom: rowPaddingBottom
-                    }}>
-                        <View style={{ 
-                            height: datePanelHeight,
-                            backgroundColor: 'white',
-                            flexDirection: 'column',
-                            justifyContent: 'center'            
-                        }}>
-                            <AppText style={{
-                                textAlign: 'center',
-                                fontSize: dateFontSize
-                            }}>
-                                {item.date_created}
-                            </AppText>
-                            <Icon large color='black' name='md-more' type='ionicon'
-                            containerStyle={{
-                                position: 'absolute',
-                                width: datePanelHeight*0.5,
-                                height: datePanelHeight*0.5,
-                                top: datePanelHeight*0.25,
-                                right: datePanelHeight*0.25
-                            }}></Icon>
-                        </View>
-                        <AvView type={item.type} source={item.media_path} />
-                        <View style={{
-                            backgroundColor: 'white',
-                            minHeight: datePanelHeight,
-                            flexDirection: 'column',
-                            justifyContent: 'center'    
-                        }}>
-                            <AppText style={{
-                                textAlign: 'center',
-                                fontSize: captionFontSize
-                            }}>
-                                {item.caption}
-                            </AppText>
-                        </View>
-                    </View>
-                )}
+                ListFooterComponent={this.renderFooter.bind(this)}
+                onEndReached={this.handleLoadMore.bind(this)}
+                renderItem={ ({item}) => this._renderPostItem(item)}
             />
         );
     };
@@ -368,6 +426,22 @@ class Home extends Component {
 
             </View>
         )
+    }
+
+    renderFooter() {
+        if (!this.state.loading) return null;
+
+        return (
+            <View
+              style={{
+                paddingVertical: 20,
+                borderTopWidth: 1,
+                borderColor: "#CED0CE"
+              }}
+            >
+              <ActivityIndicator animating size="large" />
+            </View>
+        );
     }
 }
 

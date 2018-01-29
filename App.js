@@ -17,6 +17,11 @@ export default class App extends React.Component {
   };
 
   async componentDidMount() {
+
+    // set global username - To-do: get from config
+    global.username = 'quat';
+    global.serverUrl = 'http://qclove.tk/qclove';
+
     await Font.loadAsync({
       'haptic': require("./assets/fonts/SVN-HapticScript.otf"),
     });
@@ -60,7 +65,6 @@ export default class App extends React.Component {
           },
           headerBackTitle: null,
           headerTintColor: 'white',
-          
         }
     });
 

@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, TextInput} from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, TextInput, ActivityIndicator, Alert} from 'react-native';
 import { Button, Icon, Avatar } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker';
 import Moment, { now } from 'moment';
+import { ImageManipulator } from 'expo';
 
 export default class AddImage extends Component {
     
-    static navigationOptions = ({ navigation }) => ({
-        headerRight: <Button backgroundColor="transparent" title="Post"></Button>
-        
-    });
-
     constructor(props) {
         super(props);
 
@@ -20,10 +16,102 @@ export default class AddImage extends Component {
         this.state = {
             caption: '',
             imageUri: this.props.navigation.state.params.imageUri,
+            imageWidth: this.props.navigation.state.params.imageWidth,
+            imageHeight: this.props.navigation.state.params.imageHeight,
             date: Moment(nowDt).format('DD/MM/YYYY')
         };
     }
+
+    static navigationOptions = ({ navigation }) => {
+        const { params = {} } = navigation.state;
+        let headerRight = (
+          <Button backgroundColor="transparent" title="Post" onPress={params.handlePost ? params.handlePost : () => null}></Button>
+        );
+        if (params.isPosting) {
+          headerRight = <ActivityIndicator />;
+        }
+        return { headerRight };
+    };
+
+    componentDidMount() {
+        this.props.navigation.setParams({ handlePost: this._handlePost });
+    }
+
+    _handlePost = async () => {
+        // Update state, show ActivityIndicator
+        this.props.navigation.setParams({ isPosting: true });
+        
+        const data = new FormData();
+
+        // date created
+        var date = Moment(this.state.date, "DD/MM/YYYY");
+        data.append('date', Moment(date).format("YYYY-MM-DD"));
+
+        // user created
+        data.append('user_created', global.username);
+
+        // caption
+        data.append('caption', this.state.caption);
+
+        // type
+        data.append('type', 1);
+
+        // image
+        if (this.state.imageWidth > 1080)
+        {
+            const manipResult = await ImageManipulator.manipulate(
+                this.state.imageUri,
+                [{resize: {width: 1080}}],
+            );
+            this.state.imageUri = manipResult.uri;
+
+        }
+
+        let uriParts = this.state.imageUri.split('.');
+        let fileType = uriParts[uriParts.length - 1];
+        data.append('upfile', {
+            uri: this.state.imageUri,
+            type: `image/${fileType}`,
+            name: `testPhotoName.${fileType}`
+        });
+
+        // REQUEST POST
+        let url = `${global.serverUrl}/createpost.php`;
+        fetch(url, {
+            method: 'post',
+            body: data
+        })
+        .then((response) => response.json())
+        .then(responseJson => {
+            this.props.navigation.setParams({ isPosting: false});
+            
+            try {
+                var result = parseInt(responseJson);
+                if (result > 0) {
+                    // success
+                    this.props.navigation.state.params.homeScreen.reload();
+                    this.props.navigation.goBack();
+                    return;
+                }
+            }
+            catch(err) {
+                // failed
+            }
+
+            this._alertPostError();
+        })
+        .catch((error) => {
+            this.props.navigation.setParams({ isPosting: false});
+            //console.error(error);
+            this._alertPostError();
+
+        });
+    }
     
+    _alertPostError = () => {
+        Alert.alert('','Đã có lỗi xảy ra, vui lòng thử lại sau.',[{text:'Ok'}]);
+    }
+
     render() {
 
         let screenWidth = Dimensions.get('window').width;
@@ -53,8 +141,10 @@ export default class AddImage extends Component {
                             padding:10,
                             textAlignVertical: 'top',
                             fontSize: captionTextFontSize,
-                        }}>
-                    </TextInput>
+                        }}
+                        onChangeText={(caption) => this.setState({caption})}
+                        value={this.state.caption}
+                    />
                 </View>
                 <View style={{
                     height: 1,
