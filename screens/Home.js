@@ -2,40 +2,16 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator } from 'react-native';
 import { ImagePicker } from 'expo';
 import { Button, Icon } from 'react-native-elements';
-import AppText from '../helpers/TextHelper'
-import AppTextStyle from '../styles/AppTextStyle'
-import AvView from '../AvView'
-import Moment, { now } from 'moment';
-
-const data = [{
-    id: 1,
-    date_created: '22/01/2017',
-    type: 'image',
-    media_path: 'https://github.com/saitoxu/InstaClone/raw/master/contents/images/landscape.jpg',
-    caption: "test caption"
-  },
-  {
-    id: 2,
-    date_created: '21/01/2017',
-    type: 'image',
-    media_path: 'https://github.com/saitoxu/InstaClone/raw/master/contents/images/snow.jpg',
-    caption: "test caption 2"
-  },
-  {
-    id: 3,
-    date_created: '20/01/2017',
-    type: 'image',
-    media_path: 'https://github.com/saitoxu/InstaClone/raw/master/contents/images/town.jpg',
-    caption: "test caption 3"
-  },
-]
+import AppText from '../helpers/TextHelper';
+import AppTextStyle from '../styles/AppTextStyle';
+import PostView from '../PostView';
 
 var globalThis;
 
 class Home extends Component {
 
     static HEADER_IMAGE_RATIO = 3/2;
-    static PAGE_SIZE = 20;
+    static PAGE_SIZE = 10;
 
     constructor(props) {
         super(props);
@@ -59,7 +35,7 @@ class Home extends Component {
     });
 
     onAddImageFromLibraryPress = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true});
+        let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, mediaTypes: ImagePicker.MediaTypeOptions.Images});
     
         if (!result.cancelled) {
             this.props.navigation.navigate('AddImage', { imageUri: result.uri, imageWidth: result.width, imageHeight: result.height, homeScreen: this});
@@ -67,35 +43,53 @@ class Home extends Component {
     };
 
     reload = () => {
-        console.log("\nRELOADING\n");
+        if (!this.state.loading && !this.state.refreshing) {
+            console.log("\nRELOADING\n");
+            this.setState(
+                {
+                    data: [],
+                    page: 1,
+                    refreshing: true,
+                },
+                () => {
+                    this.fetchPostsRequest();
+                }
+            );
+        }
     }
 
     fetchPostsRequest = () => {
         console.log("\nFetch posts");
         const { page } = this.state;
         var pageSize = Home.PAGE_SIZE;
-        const url = `${global.serverUrl}/api.php/post?order=date_created,desc&page=${page},${pageSize}`;
-        console.log(url);
+        const url = `${global.serverUrl}/api.php/post?order[]=date,desc&order[]=date_created,desc&page=${page},${pageSize}`;
         this.setState({ loading: true });
-        fetch(url)
-        .then(res => res.json())
-        .then(res => {
-            console.log(res.post.records);
-            this.setState({
-                data: page === 1 ? res.post.records : [...this.state.data, ...res.post.records],
-                loading: false,
-                refreshing: false,
-                needLoadMore: res.post.records.length < Home.PAGE_SIZE ? false : true,
+        
+        setTimeout(() => {
+            fetch(url)
+            .then(res => res.json())
+            .then(res => {
+                console.log(res.post.records);
+                this.setState({
+                    data: page === 1 ? res.post.records : [...this.state.data, ...res.post.records],
+                    loading: false,
+                    refreshing: false,
+                    needLoadMore: res.post.records.length < Home.PAGE_SIZE ? false : true,
+                });
+            })
+            .catch(error => {
+                console.log(error);
+                this.setState({ 
+                    loading: false, 
+                    refreshing: false,
+                    page: this.state.page - 1 
+                });
             });
-        })
-        .catch(error => {
-            console.log(error);
-            this.setState({ loading: false, page: this.state.page - 1 });
-        });
+        }, 1500);
     }
 
     handleLoadMore() {
-        if (this.state.needLoadMore) {
+        if (this.state.needLoadMore && !this.state.loading && !this.state.refreshing) {
             console.log('\nLoad more');
             this.setState(
                 {
@@ -108,65 +102,6 @@ class Home extends Component {
         }
     }
 
-    _renderPostItem(item){
-
-        let screenWidth = Dimensions.get('window').width;
-        let headerImageHeight = screenWidth/Home.HEADER_IMAGE_RATIO;
-        let datePanelHeight = headerImageHeight * 0.15;
-        let rowPaddingBottom = headerImageHeight * 0.05;
-        
-        let dateFontSize = 25;
-        let captionFontSize = 20;
-
-        var date = Moment(item[1]);
-        var dateStr = Moment(date).format("DD/MM/YYYY");
-        var postSrc = `${global.serverUrl}${item[6]}`;
-
-        var type = item[4] == 1 ? "image" : "video";
-
-        return (
-            <View style={{
-                paddingBottom: rowPaddingBottom
-            }}>
-                <View style={{ 
-                    height: datePanelHeight,
-                    backgroundColor: 'white',
-                    flexDirection: 'column',
-                    justifyContent: 'center'            
-                }}>
-                    <AppText style={{
-                        textAlign: 'center',
-                        fontSize: dateFontSize
-                    }}>
-                        {dateStr}
-                    </AppText>
-                    <Icon large color='black' name='md-more' type='ionicon'
-                    containerStyle={{
-                        position: 'absolute',
-                        width: datePanelHeight*0.5,
-                        height: datePanelHeight*0.5,
-                        top: datePanelHeight*0.25,
-                        right: datePanelHeight*0.25
-                    }}></Icon>
-                </View>
-                <AvView type={type} source={postSrc} />
-                <View style={{
-                    backgroundColor: 'white',
-                    minHeight: datePanelHeight,
-                    flexDirection: 'column',
-                    justifyContent: 'center'    
-                }}>
-                    <AppText style={{
-                        textAlign: 'center',
-                        fontSize: captionFontSize
-                    }}>
-                        {item[5]}
-                    </AppText>
-                </View>
-            </View>
-        );
-    }
-
     render() {
         return (
             <FlatList
@@ -176,7 +111,10 @@ class Home extends Component {
                 ListHeaderComponent={this.renderHeader}
                 ListFooterComponent={this.renderFooter.bind(this)}
                 onEndReached={this.handleLoadMore.bind(this)}
-                renderItem={ ({item}) => this._renderPostItem(item)}
+                refreshing={this.state.refreshing}
+                onRefresh={this.reload}
+                renderItem={ ({item}) => <PostView item={item}/>}
+                initialNumToRender={3}
             />
         );
     };

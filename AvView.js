@@ -23,8 +23,8 @@ export default class AvView extends Component {
 
   constructor(props) {
     super(props);
-    this.onLoad = this.onLoad.bind(this);
-    this.onProgress = this.onProgress.bind(this);
+    // this.onLoad = this.onLoad.bind(this);
+    // this.onProgress = this.onProgress.bind(this);
     //this.onBuffer = this.onBuffer.bind(this);
   }
 
