@@ -42,13 +42,15 @@ export default class PostView extends PureComponent {
                         {dateStr}
                     </AppText>
                     <Icon large color='black' name='md-more' type='ionicon'
-                    containerStyle={{
-                        position: 'absolute',
-                        width: datePanelHeight*0.5,
-                        height: datePanelHeight*0.5,
-                        top: datePanelHeight*0.25,
-                        right: datePanelHeight*0.25
-                    }}></Icon>
+                        containerStyle={{
+                            position: 'absolute',
+                            width: datePanelHeight*0.5,
+                            height: datePanelHeight*0.5,
+                            top: datePanelHeight*0.25,
+                            right: datePanelHeight*0.25
+                        }}
+                        onPress={() => this.props.onPress()}
+                    />
                 </View>
                 <AvView type={type} source={postSrc} />
                 <View style={{

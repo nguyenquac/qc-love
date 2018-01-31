@@ -10,22 +10,32 @@ export default class AddImage extends Component {
     constructor(props) {
         super(props);
 
-        // get default date
-        var nowDt = Moment();
+        var date = '';
+        var caption = '';
+        if (this.props.navigation.state.params.mode == 'add') {
+            // get default date
+            var nowDt = Moment();
+            date = Moment(nowDt).format('DD/MM/YYYY');
+        } else {
+            date = this.props.navigation.state.params.date;
+            caption = this.props.navigation.state.params.caption;
+        }
+        
 
         this.state = {
-            caption: '',
+            caption: caption,
             imageUri: this.props.navigation.state.params.imageUri,
             imageWidth: this.props.navigation.state.params.imageWidth,
             imageHeight: this.props.navigation.state.params.imageHeight,
-            date: Moment(nowDt).format('DD/MM/YYYY')
+            date: date
         };
     }
 
     static navigationOptions = ({ navigation }) => {
         const { params = {} } = navigation.state;
+        var title = (params.mode == 'add') ? 'Post' : 'Update';
         let headerRight = (
-          <Button backgroundColor="transparent" title="Post" onPress={params.handlePost ? params.handlePost : () => null}></Button>
+          <Button backgroundColor="transparent" title={title} onPress={params.handlePost ? params.handlePost : () => null}></Button>
         );
         if (params.isPosting) {
           headerRight = <ActivityIndicator />;
@@ -41,71 +51,119 @@ export default class AddImage extends Component {
         // Update state, show ActivityIndicator
         this.props.navigation.setParams({ isPosting: true });
         
-        const data = new FormData();
+        if (this.props.navigation.state.params.mode == 'add') {
+            // INSERT
+            const data = new FormData();
 
-        // date created
-        var date = Moment(this.state.date, "DD/MM/YYYY");
-        data.append('date', Moment(date).format("YYYY-MM-DD"));
+            // date created
+            var date = Moment(this.state.date, "DD/MM/YYYY");
+            data.append('date', Moment(date).format("YYYY-MM-DD"));
 
-        // user created
-        data.append('user_created', global.username);
+            // user created
+            data.append('user_created', global.username);
 
-        // caption
-        data.append('caption', this.state.caption);
+            // caption
+            data.append('caption', this.state.caption);
 
-        // type
-        data.append('type', 1);
+            // type
+            data.append('type', 1);
 
-        // image
-        if (this.state.imageWidth > 1080)
-        {
-            const manipResult = await ImageManipulator.manipulate(
-                this.state.imageUri,
-                [{resize: {width: 1080}}],
-            );
-            this.state.imageUri = manipResult.uri;
+            // image
+            if (this.state.imageWidth > 1080)
+            {
+                const manipResult = await ImageManipulator.manipulate(
+                    this.state.imageUri,
+                    [{resize: {width: 1080}}],
+                );
+                this.state.imageUri = manipResult.uri;
 
-        }
+            }
 
-        let uriParts = this.state.imageUri.split('.');
-        let fileType = uriParts[uriParts.length - 1];
-        data.append('upfile', {
-            uri: this.state.imageUri,
-            type: `image/${fileType}`,
-            name: `testPhotoName.${fileType}`
-        });
+            let uriParts = this.state.imageUri.split('.');
+            let fileType = uriParts[uriParts.length - 1];
+            data.append('upfile', {
+                uri: this.state.imageUri,
+                type: `image/${fileType}`,
+                name: `testPhotoName.${fileType}`
+            });
 
-        // REQUEST POST
-        let url = `${global.serverUrl}/createpost.php`;
-        fetch(url, {
-            method: 'post',
-            body: data
-        })
-        .then((response) => response.json())
-        .then(responseJson => {
-            this.props.navigation.setParams({ isPosting: false});
-            
-            try {
-                var result = parseInt(responseJson);
-                if (result > 0) {
-                    // success
-                    this.props.navigation.state.params.homeScreen.reload();
-                    this.props.navigation.goBack();
-                    return;
+            // REQUEST POST
+            let url = `${global.serverUrl}/createpost.php`;
+            fetch(url, {
+                method: 'post',
+                body: data
+            })
+            .then((response) => response.json())
+            .then(responseJson => {
+                this.props.navigation.setParams({ isPosting: false});
+                
+                try {
+                    var result = parseInt(responseJson);
+                    if (result > 0) {
+                        // success
+                        this.props.navigation.state.params.homeScreen.reload();
+                        this.props.navigation.goBack();
+                        return;
+                    }
                 }
-            }
-            catch(err) {
-                // failed
-            }
+                catch(err) {
+                    // failed
+                }
 
-            this._alertPostError();
-        })
-        .catch((error) => {
-            this.props.navigation.setParams({ isPosting: false});
-            //console.error(error);
-            this._alertPostError();
+                this._alertPostError();
+            })
+            .catch((error) => {
+                this.props.navigation.setParams({ isPosting: false});
+                //console.error(error);
+                this._alertPostError();
 
-        });
+            });
+        }
+        else {
+            // UPDATE
+            const data = new FormData();
+
+            // date created
+            var date = Moment(this.state.date, "DD/MM/YYYY");
+            data.append('date', Moment(date).format("YYYY-MM-DD"));
+
+            // caption
+            data.append('caption', this.state.caption);
+
+            // REQUEST PUT
+            let url = `${global.serverUrl}/api.php/post/${this.props.navigation.state.params.id}`;
+            fetch(url, {
+                method: 'put',
+                body: data
+            })
+            .then((response) => response.json())
+            .then(responseJson => {
+                console.log(`\n ${responseJson}`);
+                this.props.navigation.setParams({ isPosting: false});
+                
+                try {
+                    var result = parseInt(responseJson);
+                    if (result > 0) {
+                        // success
+                        this.props.navigation.state.params.homeScreen.reload();
+                        this.props.navigation.goBack();
+                        return;
+                    }
+                }
+                catch(err) {
+                    // failed
+                }
+
+                this._alertPostError();
+            })
+            .catch((error) => {
+                this.props.navigation.setParams({ isPosting: false});
+                console.error(error);
+                this._alertPostError();
+
+            });
+        }
+        
     }
     
     _alertPostError = () => {

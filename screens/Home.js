@@ -5,6 +5,8 @@ import { Button, Icon } from 'react-native-elements';
 import AppText from '../helpers/TextHelper';
 import AppTextStyle from '../styles/AppTextStyle';
 import PostView from '../PostView';
+import ActionSheet from 'react-native-actionsheet';
+import Moment, { now } from 'moment';
 
 var globalThis;
 
@@ -22,6 +24,7 @@ class Home extends Component {
             page: 0,
             refreshing: false,
             needLoadMore: true,
+            currentPostIndex: -1,
         };
     }
 
@@ -38,7 +41,7 @@ class Home extends Component {
         let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, mediaTypes: ImagePicker.MediaTypeOptions.Images});
     
         if (!result.cancelled) {
-            this.props.navigation.navigate('AddImage', { imageUri: result.uri, imageWidth: result.width, imageHeight: result.height, homeScreen: this});
+            this.props.navigation.navigate('AddImage', { mode: 'add', imageUri: result.uri, imageWidth: result.width, imageHeight: result.height, homeScreen: this});
         }
     };
 
@@ -102,20 +105,49 @@ class Home extends Component {
         }
     }
 
+    handlePostOption(index) {
+        console.log(`Option for post ${index}`);
+        this.setState({
+            currentPostIndex: index
+        });
+        this.ActionSheet.show();
+    }
+
+    handlePostOptionActionSheetPress(i) {
+        if (i == 1) {
+            // EDIT
+            var item = this.state.data[this.state.currentPostIndex];
+            var postImgSrc = `${global.serverUrl}${item[6]}`;
+            var date = Moment(item[1]);
+            var dateStr = Moment(date).format("DD/MM/YYYY");
+            this.props.navigation.navigate('AddImage', { mode: 'edit', id:item[0], imageUri: postImgSrc, homeScreen: this, date: dateStr, caption: item[5], imageWidth: 0, imageHeight: 0});
+        }
+    }
+
     render() {
         return (
-            <FlatList
-                style={styles.container}
-                data={this.state.data}
-                keyExtractor={(item, index) => index}
-                ListHeaderComponent={this.renderHeader}
-                ListFooterComponent={this.renderFooter.bind(this)}
-                onEndReached={this.handleLoadMore.bind(this)}
-                refreshing={this.state.refreshing}
-                onRefresh={this.reload}
-                renderItem={ ({item}) => <PostView item={item}/>}
-                initialNumToRender={3}
-            />
+            <View style={styles.container}>
+                <FlatList
+                    style={styles.container}
+                    data={this.state.data}
+                    keyExtractor={(item, index) => index} 
+                    ListHeaderComponent={this.renderHeader}
+                    ListFooterComponent={this.renderFooter.bind(this)}
+                    onEndReached={this.handleLoadMore.bind(this)}
+                    refreshing={this.state.refreshing}
+                    onRefresh={this.reload}
+                    renderItem={ ({item, index}) => <PostView item={item} onPress={() => this.handlePostOption(index)}/>}
+                    initialNumToRender={3}
+                />
+                <ActionSheet
+                    ref={o => this.ActionSheet = o}
+                    title={'Action'}
+                    options={['Cancel', 'Edit', 'Delete']}
+                    cancelButtonIndex={0}
+                    destructiveButtonIndex={2}
+                    onPress={this.handlePostOptionActionSheetPress.bind(this)}
+                />
+            </View>
         );
     };
 
