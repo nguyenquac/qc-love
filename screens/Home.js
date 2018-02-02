@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { ImagePicker } from 'expo';
 import { Button, Icon } from 'react-native-elements';
 import AppText from '../helpers/TextHelper';
@@ -113,6 +113,38 @@ class Home extends Component {
         this.ActionSheet.show();
     }
 
+    handleDeletePostPress() {
+        var item = this.state.data[this.state.currentPostIndex];
+        console.log(`Delete post id ${item[0]}`);
+        const url = `${global.serverUrl}/api.php/post/${item[0]}?method=DELETE`;
+        fetch(url, {
+            method: 'get',
+        })
+        .then((response) => response.json())
+        .then(responseJson => {
+            console.log(`\n ${responseJson}`);
+            
+            try {
+                var result = parseInt(responseJson);
+                if (result > 0) {
+                    // success
+                    this.reload();
+                    return;
+                }
+            }
+            catch(err) {
+                // failed
+            }
+
+            this.alertMiscError();
+        })
+        .catch((error) => {
+            console.error(error);
+            this.alertMiscError();
+
+        });
+    }
+
     handlePostOptionActionSheetPress(i) {
         if (i == 1) {
             // EDIT
@@ -121,7 +153,19 @@ class Home extends Component {
             var date = Moment(item[1]);
             var dateStr = Moment(date).format("DD/MM/YYYY");
             this.props.navigation.navigate('AddImage', { mode: 'edit', id:item[0], imageUri: postImgSrc, homeScreen: this, date: dateStr, caption: item[5], imageWidth: 0, imageHeight: 0});
+        } else if (i == 2) {
+            // DELETE
+            Alert.alert('Confirm', 'Bạn có chắc chắn xóa hông?',
+                [
+                    {text: 'Hông', style: 'cancel'},
+                    {text: 'Xoá lun', onPress: () => {this.handleDeletePostPress()}}
+                ]
+            );
         }
+    }
+
+    alertMiscError() {
+        Alert.alert('','Đã có lỗi xảy ra, vui lòng thử lại sau.',[{text:'Ok'}]);
     }
 
     render() {

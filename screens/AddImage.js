@@ -121,20 +121,23 @@ export default class AddImage extends Component {
         }
         else {
             // UPDATE
-            const data = new FormData();
+            var data = {};
 
             // date created
             var date = Moment(this.state.date, "DD/MM/YYYY");
-            data.append('date', Moment(date).format("YYYY-MM-DD"));
+            data.date = Moment(date).format("YYYY-MM-DD");
 
             // caption
-            data.append('caption', this.state.caption);
+            data.caption = this.state.caption;
+
+            // json data
+            var jsonData = JSON.stringify(data);
 
             // REQUEST PUT
-            let url = `${global.serverUrl}/api.php/post/${this.props.navigation.state.params.id}`;
+            let url = `${global.serverUrl}/api.php/post/${this.props.navigation.state.params.id}?method=PUT`;
             fetch(url, {
                 method: 'put',
-                body: data
+                body: jsonData
             })
             .then((response) => response.json())
             .then(responseJson => {
