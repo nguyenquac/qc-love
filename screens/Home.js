@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator, Alert} from 'react-native';
 import { ImagePicker } from 'expo';
 import { Button, Icon } from 'react-native-elements';
 import AppText from '../helpers/TextHelper';
