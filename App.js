@@ -1,30 +1,51 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import { Font } from 'expo';
 
-import Home from './screens/Home';
-import Scr1 from './screens/Scr1';
-import AddImage from './screens/AddImage';
+import HomeNavigator from './HomeNavigator';
+import ChooseGender from './screens/ChooseGender';
 
 import BoyThemeStyle from './styles/ThemeBoyStyle'
-const themeStyle = BoyThemeStyle;
+import GirlThemeStyle from './styles/ThemeGirlStyle'
 
 export default class App extends React.Component {
   
   state = {
     fontLoaded: false,
+    genderChosen: false,
+    themeStyle: BoyThemeStyle,
   };
 
   async componentDidMount() {
 
-    // set global username - To-do: get from config
-    global.username = 'quat';
+    // set global username
+    var username = '';
+    try {
+      username = await AsyncStorage.getItem('username');
+    } catch (error) {
+      // Error retrieving data
+    }
+    global.username = username;
+
     global.serverUrl = 'http://qclove.tk/qclove';
 
     await Font.loadAsync({
       'haptic': require("./assets/fonts/SVN-HapticScript.otf"),
     });
+
+    let gender = null;
+    try {
+      gender = await AsyncStorage.getItem('gender');
+    } catch (error) {
+      // Error retrieving data
+    }
+
+    if (gender != null) {
+      global.gender = gender;
+      var selectThemeStyle = (gender == 'male') ? BoyThemeStyle : GirlThemeStyle;
+      this.setState({ genderChosen: true, themeStyle: selectThemeStyle});
+    }
 
     this.setState({ fontLoaded: true });
     this.render();
@@ -36,41 +57,30 @@ export default class App extends React.Component {
       return null;
     }
 
-    let headerTitleFontSize = 40;
-
-    const HomeStack = StackNavigator({
-      Home: {
-        screen: Home,
-        navigationOptions: {
-          title: 'QCLove',
+    const ChooseGenderStack = StackNavigator({
+        ChooseGender: {
+          screen: ChooseGender
         },
-      },
-      AddImage: {
-        screen: AddImage,
-        navigationOptions: ({ navigation }) => ({
-          title: 'Image',
-
-        }),
-      },
-    },
-    {
-        navigationOptions: {
-          headerStyle: themeStyle.header,
-          headerTitleStyle: {
-            color: 'white',
-            fontFamily: 'haptic',
-            fontSize: headerTitleFontSize, 
-            fontWeight: "200",
-            alignSelf: 'center',
-          },
-          headerBackTitle: null,
-          headerTintColor: 'white',
+        HomeNavigator: {
+          screen: HomeNavigator
         }
-    });
-
-    return (
-      <HomeStack/>
+      },
+      {
+        navigationOptions: {
+          header: null,
+        }
+      }
     );
+
+    if (this.state.genderChosen) {
+      return (
+        <HomeNavigator/>
+      );
+    } else {
+      return (
+        <ChooseGenderStack/>
+      );
+    }
   }
 }
 
