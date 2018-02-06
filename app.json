@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "qc-love",
-    "description": "This project is really great.",
+    "name": "QCLove",
+    "description": "QCLove from QC Production",
     "slug": "qc-love",
     "privacy": "public",
     "sdkVersion": "24.0.0",

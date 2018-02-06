@@ -221,9 +221,9 @@ class Home extends Component {
         let tillAnniversaryPanelMarginTop = headerImageHeight*0.05;
         let tillAnniversaryPanelHeight = anniversaryDatePanelHeight*0.5;
 
-        let anniMonth = 1; // start from 0 -> feb = 1
-        let anniDay = 17;
-        let anniYear = 2017;
+        let anniMonth = global.anniMonth - 1; // start from 0 -> feb = 1
+        let anniDay = global.anniDate;
+        let anniYear = global.anniYear;
 
         let anniDate = new Date(anniYear,anniMonth,anniDay);
         let todayDate = new Date();
@@ -243,6 +243,10 @@ class Home extends Component {
         let date4_ms = nextAnniDate.getTime();
         difference_ms = date4_ms - date3_ms;
         let tillAnniDay = Math.ceil(difference_ms/one_day);
+
+        let isAnniversary = (todayDate.getDate() == anniDay && todayDate.getMonth() == anniMonth);
+        let numYear = todayDate.getFullYear() - anniYear;
+        let numYearText = (numYear) > 1 ? `${numYear} years` : `1 year`;
 
         let avatarNameFontSize = 30;
         let anniMonthFontSize = 22;
@@ -312,7 +316,7 @@ class Home extends Component {
                                 }}>
                     </View>
                     <View style={avatarStyles.avatarNameContainerLeft}><AppText style={avatarStyles.avatarName}>{leftName}</AppText></View>
-                    <Image source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/1/17/Batman-BenAffleck.jpg'}} style={avatarStyles.avatar} />
+                    <Image source={require('../assets/avatar_quat.jpg')} style={avatarStyles.avatar} />
                     <Image source={{ uri: 'https://images.moviepilot.com/image/upload/c_fill,h_340,q_auto:good,w_460/b4yxwv7bffhfpc86clig.jpg'}} style={avatarStyles.avatar} />
                     <View style={avatarStyles.avatarNameContainerRight}><AppText style={avatarStyles.avatarName}>{rightName}</AppText></View>
                     <Image source={require('../assets/heart-stroke.png')}
@@ -412,26 +416,46 @@ class Home extends Component {
 
                 </View>
 
-                <View style={{
-                                marginTop:tillAnniversaryPanelMarginTop,
-                                height:tillAnniversaryPanelHeight,
-                                backgroundColor: 'white',
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                    <AppText style={{
+                { isAnniversary ? (
+                    <View style={{
+                        marginTop:tillAnniversaryPanelMarginTop,
+                        height:tillAnniversaryPanelHeight,
+                        backgroundColor: 'white',
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <AppText style={{
                             fontSize: tillAnniDayFontSize,
                         }}>
-                        {tillAnniDay}
-                    </AppText>
-                    <AppText style={{
-                            fontSize: tillAnniDayLabelFontSize,
-                        }}>
-                        {'  ngày đến lễ kỉ niệm'}
-                    </AppText> 
-                </View>
+                            {tillAnniDay}
+                        </AppText>
+                        <AppText style={{
+                                fontSize: tillAnniDayLabelFontSize,
+                            }}>
+                            {'  ngày đến lễ kỉ niệm'}
+                        </AppText> 
+                    </View>
+                ) : (
+                    <View style={{
+                        marginTop:tillAnniversaryPanelMarginTop,
+                        height:tillAnniversaryPanelHeight,
+                        backgroundColor: 'white',
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <AppText style={{
+                                fontSize: tillAnniDayLabelFontSize,
+                                color: '#f92070'
+                            }}>
+                            {`Happy ${numYearText} anniversary!`}
+                        </AppText> 
+                    </View>
+                )
+                }
 
                 <View style={{
                     height:tillAnniversaryPanelMarginTop,

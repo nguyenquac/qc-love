@@ -16,7 +16,14 @@ export default class HomeNavigator extends React.Component {
             themeStyle = (global.gender == 'male') ? BoyThemeStyle : GirlThemeStyle;
         }
 
-        let isAnniversary = true;
+        // check anniversary
+        let anniMonth = global.anniMonth - 1; // start from 0 -> feb = 1
+        let anniDay = global.anniDate;
+        let todayDate = new Date();
+        let isAnniversary = false;
+        if (todayDate.getDate() == anniDay && todayDate.getMonth() == anniMonth) {
+          isAnniversary = true;
+        }
 
         let headerTitleFontSize = 40;
 

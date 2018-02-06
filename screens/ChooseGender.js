@@ -35,6 +35,8 @@ export default class ChooseGender extends Component {
         let fontSize = 30;
 
         let screenWidth = Dimensions.get('window').width;
+        let screenHeight = Dimensions.get('window').height;
+
         let avatarDiameter = screenWidth * 0.3;
 
         const avatarStyles = StyleSheet.create({
@@ -53,6 +55,22 @@ export default class ChooseGender extends Component {
                 flexDirection: 'column',
                 justifyContent: 'center',
             }}>
+                <View style={{
+                    height: screenHeight,
+                    width: screenWidth/2,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    backgroundColor: '#fff75e'
+                }} />
+                <View style={{
+                    height: screenHeight,
+                    width: screenWidth/2,
+                    position: 'absolute',
+                    top: 0,
+                    left: screenWidth/2,
+                    backgroundColor: '#ffa133'
+                }} />
                 <Text style={{
                     fontSize: fontSize,
                     textAlign: 'center',

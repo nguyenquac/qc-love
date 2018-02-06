@@ -19,6 +19,11 @@ export default class App extends React.Component {
 
   async componentDidMount() {
 
+    // set anniversary
+    global.anniDate = 17;
+    global.anniMonth = 2;
+    global.anniYear = 2017;
+
     // set global username
     var username = '';
     try {
