@@ -1,13 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import { Font } from 'expo';
+import { Font, Asset } from 'expo';
 
 import HomeNavigator from './HomeNavigator';
 import ChooseGender from './screens/ChooseGender';
 
 import BoyThemeStyle from './styles/ThemeBoyStyle'
 import GirlThemeStyle from './styles/ThemeGirlStyle'
+
+function cacheImages(images) {
+  return images.map(image => {
+    return Asset.fromModule(image).downloadAsync();
+  });
+}
 
 export default class App extends React.Component {
   
@@ -20,7 +26,7 @@ export default class App extends React.Component {
   async componentDidMount() {
 
     // set anniversary
-    global.anniDate = 17;
+    global.anniDate = 7;
     global.anniMonth = 2;
     global.anniYear = 2017;
 
@@ -34,6 +40,18 @@ export default class App extends React.Component {
     global.username = username;
 
     global.serverUrl = 'http://qclove.tk/qclove';
+
+    // cache images
+    const imageAssets = cacheImages([
+      require('./assets/avatar_chanh.jpg'),
+      require('./assets/avatar_quat.jpg'),
+      require('./assets/cover.jpg'),
+      require('./assets/heart.png'),
+      require('./assets/heart-stroke.png'),
+      require('./assets/happyAnniversary_content.png'),
+      require('./assets/icon_calendar.png'),
+    ]);
+    await Promise.all([...imageAssets]);
 
     await Font.loadAsync({
       'haptic': require("./assets/fonts/SVN-HapticScript.otf"),

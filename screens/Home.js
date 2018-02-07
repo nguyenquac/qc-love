@@ -290,12 +290,14 @@ class Home extends Component {
                     style={{
                         backgroundColor:'transparent',
                         height: headerImageHeight,
+                        width: screenWidth,
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         right: 0,
+                        resizeMode: 'contain'
                     }}
-                    source={{uri:'http://vanhien.vn/uploads/news/2014/11/khue-van-cac.jpg'}}
+                    source={require('../assets/cover.jpg')}
                 >
                 </Image>
                 <View style={{
@@ -317,7 +319,7 @@ class Home extends Component {
                     </View>
                     <View style={avatarStyles.avatarNameContainerLeft}><AppText style={avatarStyles.avatarName}>{leftName}</AppText></View>
                     <Image source={require('../assets/avatar_quat.jpg')} style={avatarStyles.avatar} />
-                    <Image source={{ uri: 'https://images.moviepilot.com/image/upload/c_fill,h_340,q_auto:good,w_460/b4yxwv7bffhfpc86clig.jpg'}} style={avatarStyles.avatar} />
+                    <Image source={require('../assets/avatar_chanh.jpg')} style={avatarStyles.avatar} />
                     <View style={avatarStyles.avatarNameContainerRight}><AppText style={avatarStyles.avatarName}>{rightName}</AppText></View>
                     <Image source={require('../assets/heart-stroke.png')}
                         style={{
@@ -416,7 +418,7 @@ class Home extends Component {
 
                 </View>
 
-                { isAnniversary ? (
+                { !isAnniversary ? (
                     <View style={{
                         marginTop:tillAnniversaryPanelMarginTop,
                         height:tillAnniversaryPanelHeight,

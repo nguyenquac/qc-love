@@ -88,7 +88,7 @@ export default class ChooseGender extends Component {
                         marginRight: 30,
                     }}>
                         <Avatar width={avatarDiameter} rounded 
-                            source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/1/17/Batman-BenAffleck.jpg'}} 
+                            source={require('../assets/avatar_quat.jpg')}
                             avatarStyle={[avatarStyles.avatar, {borderColor: '#4286f4'}]}
                             onPress={() => this.maleAvatarPressed()} 
                         />
@@ -99,7 +99,7 @@ export default class ChooseGender extends Component {
                         marginLeft: 30,
                     }}>
                         <Avatar width={avatarDiameter} rounded 
-                            source={{ uri: 'https://images.moviepilot.com/image/upload/c_fill,h_340,q_auto:good,w_460/b4yxwv7bffhfpc86clig.jpg'}} 
+                            source={require('../assets/avatar_chanh.jpg')}
                             avatarStyle={[avatarStyles.avatar, {borderColor: '#f92070'}]} 
                             onPress={() => this.femaleAvatarPressed()} 
                         />
