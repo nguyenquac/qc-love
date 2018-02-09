@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import {Text, View, Dimensions, Image} from 'react-native';
+import {Text, View, Dimensions, Image, Platform} from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import AppText from './helpers/TextHelper'
 import AvView from './AvView';
@@ -18,6 +18,10 @@ export default class PostView extends PureComponent {
         
         let dateFontSize = 25;
         let captionFontSize = 23;
+        if (Platform.OS === 'ios') {
+            dateFontSize = 16;
+            captionFontSize = 15;
+        }
 
         var date = Moment(item[1]);
         var dateStr = Moment(date).format("DD/MM/YYYY");
@@ -61,7 +65,8 @@ export default class PostView extends PureComponent {
                 }}>
                     <AppText style={{
                         textAlign: 'center',
-                        fontSize: captionFontSize
+                        fontSize: captionFontSize,
+                        margin: 5,
                     }}>
                         {item[5]}
                     </AppText>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Image, AsyncStorage } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Image, AsyncStorage, Platform } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import AppText from '../helpers/TextHelper';
 
@@ -33,6 +33,9 @@ export default class ChooseGender extends Component {
 
     render() {
         let fontSize = 30;
+        if (Platform.OS === 'ios') {
+            fontSize = 20;
+        }
 
         let screenWidth = Dimensions.get('window').width;
         let screenHeight = Dimensions.get('window').height;
@@ -74,7 +77,7 @@ export default class ChooseGender extends Component {
                 <Text style={{
                     fontSize: fontSize,
                     textAlign: 'center',
-                    margin: 50
+                    margin: 50,
                 }}>
                     Chọn nhân vật của bạn
                 </Text>

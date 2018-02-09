@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator, Alert} from 'react-native';
+import { StyleSheet, Text, View, ListView, Dimensions, Image, FlatList, ActivityIndicator, Alert, Platform} from 'react-native';
 import { ImagePicker } from 'expo';
 import { Button, Icon } from 'react-native-elements';
 import AppText from '../helpers/TextHelper';
@@ -38,7 +38,7 @@ class Home extends Component {
     });
 
     onAddImageFromLibraryPress = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, mediaTypes: ImagePicker.MediaTypeOptions.Images});
+        let result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 1});
     
         if (!result.cancelled) {
             this.props.navigation.navigate('AddImage', { mode: 'add', imageUri: result.uri, imageWidth: result.width, imageHeight: result.height, homeScreen: this});
@@ -209,6 +209,16 @@ class Home extends Component {
 
         let leftName = 'Quất';
         let rightName = 'Chanh';
+        let leftAvatar = require('../assets/avatar_quat.jpg');
+        let rightAvatar = require('../assets/avatar_chanh.jpg');
+        if (global.gender == 'female') {
+            let tmpName = leftName;
+            let tmpAvatar = leftAvatar;
+            leftName = rightName;
+            leftAvatar = rightAvatar;
+            rightName = tmpName;
+            rightAvatar = tmpAvatar;
+        }
 
         let anniversaryDatePanelMarginTop = headerImageHeight*0.15;
         let anniversaryDatePanelHeight = avatarNamePanelHeight;
@@ -255,6 +265,16 @@ class Home extends Component {
         let anniDaysTogetherLabelFontSize = 35;
         let tillAnniDayFontSize = 42;
         let tillAnniDayLabelFontSize = 30;
+
+        if (Platform.OS === 'ios') {
+            avatarNameFontSize = 20;
+            anniMonthFontSize = 12;
+            anniDayFontSize = 23;
+            anniCountFontSize = 28;
+            anniDaysTogetherLabelFontSize = 18;
+            tillAnniDayFontSize = 25;
+            tillAnniDayLabelFontSize = 16;
+        }
 
         const avatarStyles = StyleSheet.create({
             avatar: {
@@ -318,8 +338,8 @@ class Home extends Component {
                                 }}>
                     </View>
                     <View style={avatarStyles.avatarNameContainerLeft}><AppText style={avatarStyles.avatarName}>{leftName}</AppText></View>
-                    <Image source={require('../assets/avatar_quat.jpg')} style={avatarStyles.avatar} />
-                    <Image source={require('../assets/avatar_chanh.jpg')} style={avatarStyles.avatar} />
+                    <Image source={leftAvatar} style={avatarStyles.avatar} />
+                    <Image source={rightAvatar} style={avatarStyles.avatar} />
                     <View style={avatarStyles.avatarNameContainerRight}><AppText style={avatarStyles.avatarName}>{rightName}</AppText></View>
                     <Image source={require('../assets/heart-stroke.png')}
                         style={{

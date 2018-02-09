@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, AsyncStorage } from 'react-native';
+import { StyleSheet, Text, View, AsyncStorage, Platform } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import CongratAnniversary from './CongratAnniversary'
@@ -25,7 +25,7 @@ export default class HomeNavigator extends React.Component {
           isAnniversary = true;
         }
 
-        let headerTitleFontSize = 40;
+        let headerTitleFontSize = Platform.OS === 'ios' ? 30 : 40;
 
         if (isAnniversary) {
           const HomeStack = StackNavigator({

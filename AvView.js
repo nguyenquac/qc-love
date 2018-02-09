@@ -31,7 +31,9 @@ export default class AvView extends Component {
   componentWillMount() {
     if (this.props.type === 'image') {
       Image.getSize(this.props.source, (w, h) => {
-        this.setState({ imageHeight: Math.floor(h * (width / w)) })
+        if (this) {
+          this.setState({ imageHeight: Math.floor(h * (width / w)) })
+        }
       })
     }
   }
